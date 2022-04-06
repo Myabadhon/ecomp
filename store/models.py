@@ -40,6 +40,27 @@ class Order(models.Model):
     def __str__(self):
         return str(self.id)
 
+    @property
+    def get_cart_total(self):
+        order_items = self.orderitem_set.all()
+        total = sum(item.get_total for item in order_items)
+        return total
+
+    @property
+    def get_cart_items(self):
+        order_items = self.orderitem_set.all()
+        total = sum(item.quantity for item in order_items)
+        return total
+
+    @property
+    def shipping(self):
+        shipping = False
+        orderitems = self.orderitem_set.all()
+        for order in orderitems:
+            if order.product.digital == False:
+                shipping = True
+            return shipping
+
 
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, blank=True, null=True)
@@ -64,7 +85,7 @@ class ShippingAddress(models.Model):
     country = models.CharField(max_length=200, blank=True, null=True)
     city = models.CharField(max_length=200, blank=True, null=True)
     district = models.CharField(max_length=200, blank=True, null=True)
-    sub_district = models.CharField(max_length=200, blank=True, null=True)
+    subdistrict = models.CharField(max_length=200, blank=True, null=True)
     postalcode = models.CharField(max_length=200, blank=True, null=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
